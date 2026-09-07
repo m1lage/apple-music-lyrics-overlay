@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleName</key>
+    <string>LyricsOverlay</string>
+    <key>CFBundleDisplayName</key>
+    <string>Apple Music 歌词悬浮窗</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.local.applemusiclyricsoverlay</string>
+    <key>CFBundleVersion</key>
+    <string>1.0</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleExecutable</key>
+    <string>LyricsOverlay</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>15.0</string>
+    <key>LSUIElement</key>
+    <true/>
+    <key>NSAppleEventsUsageDescription</key>
+    <string>需要读取 Apple Music 当前播放的歌曲名称、艺人和播放进度，以便显示同步歌词。</string>
+    <key>NSHighResolutionCapable</key>
+    <true/>
+</dict>
+</plist>
