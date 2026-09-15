@@ -26,7 +26,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let content = LyricsOverlayView(
             viewModel: viewModel,
             onPrevious: { [weak self] in self?.musicController.previousTrack() },
-            onNext: { [weak self] in self?.musicController.nextTrack() }
+            onNext: { [weak self] in self?.musicController.nextTrack() },
+            onToggleFavorite: { [weak self] in self?.toggleFavorite() }
         )
         window = OverlayWindow(rootView: content)
         window.orderFrontRegardless()
@@ -68,6 +69,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         sender.title = window.ignoresMouseEvents ? "关闭点击穿透" : "开启点击穿透"
     }
 
+    /// Optimistically flips the heart immediately so the tap feels instant;
+    /// the next poll tick confirms it once Music.app's write actually lands
+    /// (both run on the same serial AppleScript queue, so it's already done
+    /// by the time that poll fires).
+    private func toggleFavorite() {
+        let newValue = !viewModel.isFavorited
+        viewModel.isFavorited = newValue
+        musicController.setFavorited(newValue)
+    }
+
     private func handle(state: MusicPlaybackState) {
         switch state {
         case .notRunning, .stopped:
@@ -92,6 +103,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 }
             }
             viewModel.updateCurrentLine(position: info.position)
+            viewModel.isFavorited = info.isFavorited
         }
     }
 }

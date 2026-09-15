@@ -9,6 +9,7 @@ final class LyricsViewModel: ObservableObject {
     @Published var isPaused: Bool = false
     @Published var hasNoLyrics: Bool = false
     @Published var isApproximateSync: Bool = false
+    @Published var isFavorited: Bool = false
 
     var lyrics: [LyricLine] = [] {
         didSet {
@@ -27,6 +28,7 @@ final class LyricsViewModel: ObservableObject {
         translation = ""
         hasNoLyrics = false
         isApproximateSync = false
+        isFavorited = false
         lyrics = []
     }
 

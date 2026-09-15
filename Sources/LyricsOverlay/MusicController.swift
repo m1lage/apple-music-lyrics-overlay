@@ -8,6 +8,7 @@ struct TrackInfo: Equatable {
     let trackId: String
     let position: TimeInterval
     let duration: TimeInterval
+    let isFavorited: Bool
 }
 
 enum MusicPlaybackState {
@@ -42,7 +43,12 @@ final class MusicController {
             set pos to player position as string
             set dur to (duration of current track) as string
             set stateStr to player state as string
-            return trackName & "<|>" & artistName & "<|>" & albumName & "<|>" & trackIdent & "<|>" & pos & "<|>" & dur & "<|>" & stateStr
+            try
+                set favStr to favorited of current track as string
+            on error
+                set favStr to "false"
+            end try
+            return trackName & "<|>" & artistName & "<|>" & albumName & "<|>" & trackIdent & "<|>" & pos & "<|>" & dur & "<|>" & stateStr & "<|>" & favStr
         else
             return "NONE"
         end if
@@ -80,6 +86,14 @@ final class MusicController {
         }
     }
 
+    /// Sets the "favorited" heart on the current track (the same one shown
+    /// in Music.app's own UI). Fire-and-forget, like the transport controls.
+    func setFavorited(_ value: Bool) {
+        scriptQueue.async { [weak self] in
+            _ = self?.runAppleScript(#"tell application "Music" to set favorited of current track to \#(value)"#)
+        }
+    }
+
     private func poll() {
         scriptQueue.async { [weak self] in
             guard let self else { return }
@@ -104,7 +118,7 @@ final class MusicController {
             return
         }
         let parts = result.components(separatedBy: "<|>")
-        guard parts.count == 7 else {
+        guard parts.count == 8 else {
             onUpdate?(.stopped)
             return
         }
@@ -114,7 +128,8 @@ final class MusicController {
             album: parts[2],
             trackId: parts[3],
             position: TimeInterval(parts[4]) ?? 0,
-            duration: TimeInterval(parts[5]) ?? 0
+            duration: TimeInterval(parts[5]) ?? 0,
+            isFavorited: parts[7] == "true"
         )
         if parts[6] == "paused" {
             onUpdate?(.paused(info))

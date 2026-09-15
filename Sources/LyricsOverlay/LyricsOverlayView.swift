@@ -6,6 +6,7 @@ struct LyricsOverlayView: View {
     @ObservedObject var viewModel: LyricsViewModel
     let onPrevious: () -> Void
     let onNext: () -> Void
+    let onToggleFavorite: () -> Void
 
     @State private var translationConfig: TranslationSession.Configuration?
     @State private var isExpanded = false
@@ -129,6 +130,17 @@ struct LyricsOverlayView: View {
         HStack(spacing: 6) {
             transportButton(systemName: "backward.fill", action: onPrevious)
             transportButton(systemName: "forward.fill", action: onNext)
+
+            Spacer().frame(width: 4)
+
+            Button(action: onToggleFavorite) {
+                Image(systemName: viewModel.isFavorited ? "heart.fill" : "heart")
+                    .font(.system(size: 8, weight: .semibold))
+                    .foregroundStyle(viewModel.isFavorited ? Color(red: 0.95, green: 0.32, blue: 0.4) : .white.opacity(0.85))
+                    .frame(width: 18, height: 18)
+                    .background(Circle().fill(.white.opacity(0.12)))
+            }
+            .buttonStyle(.plain)
         }
         .padding(.top, 3)
     }
