@@ -4,6 +4,8 @@ import Translation
 @MainActor
 struct LyricsOverlayView: View {
     @ObservedObject var viewModel: LyricsViewModel
+    let onPrevious: () -> Void
+    let onNext: () -> Void
 
     @State private var translationConfig: TranslationSession.Configuration?
     @State private var isExpanded = false
@@ -110,11 +112,36 @@ struct LyricsOverlayView: View {
                     maxWidth: 560
                 )
             }
+
+            if viewModel.trackTitle != nil {
+                transportControls
+            }
         }
         .padding(EdgeInsets(top: 15, leading: 19, bottom: 15, trailing: 19))
         .frame(minWidth: 280, alignment: .leading)
         .fixedSize(horizontal: true, vertical: true)
         .background(glassBackground(cornerRadius: 16))
+    }
+
+    /// Quick track-switching, revealed alongside the rest of the expanded
+    /// panel — no need to jump back to Music.app just to skip a song.
+    private var transportControls: some View {
+        HStack(spacing: 10) {
+            transportButton(systemName: "backward.fill", action: onPrevious)
+            transportButton(systemName: "forward.fill", action: onNext)
+        }
+        .padding(.top, 4)
+    }
+
+    private func transportButton(systemName: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: systemName)
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(.white.opacity(0.85))
+                .frame(width: 28, height: 28)
+                .background(Circle().fill(.white.opacity(0.12)))
+        }
+        .buttonStyle(.plain)
     }
 
     private func glassBackground(cornerRadius: CGFloat) -> some View {

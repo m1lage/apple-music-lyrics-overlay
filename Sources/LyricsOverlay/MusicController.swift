@@ -63,6 +63,23 @@ final class MusicController {
         timer = nil
     }
 
+    /// Skips to the next track. Fire-and-forget: the next poll tick (at most
+    /// 0.5s later) picks up the new track and refreshes the overlay.
+    func nextTrack() {
+        scriptQueue.async { [weak self] in
+            _ = self?.runAppleScript(#"tell application "Music" to next track"#)
+        }
+    }
+
+    /// Goes back a track. Matches Apple Music's own back-button behavior:
+    /// restarts the current track if it's already a few seconds in, otherwise
+    /// jumps to the previous one.
+    func previousTrack() {
+        scriptQueue.async { [weak self] in
+            _ = self?.runAppleScript(#"tell application "Music" to previous track"#)
+        }
+    }
+
     private func poll() {
         scriptQueue.async { [weak self] in
             guard let self else { return }

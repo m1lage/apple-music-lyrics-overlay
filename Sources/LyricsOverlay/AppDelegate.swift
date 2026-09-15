@@ -23,7 +23,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func setupWindow() {
-        let content = LyricsOverlayView(viewModel: viewModel)
+        let content = LyricsOverlayView(
+            viewModel: viewModel,
+            onPrevious: { [weak self] in self?.musicController.previousTrack() },
+            onNext: { [weak self] in self?.musicController.nextTrack() }
+        )
         window = OverlayWindow(rootView: content)
         window.orderFrontRegardless()
     }
