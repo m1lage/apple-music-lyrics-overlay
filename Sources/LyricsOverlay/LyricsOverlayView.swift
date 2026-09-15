@@ -126,19 +126,19 @@ struct LyricsOverlayView: View {
     /// Quick track-switching, revealed alongside the rest of the expanded
     /// panel — no need to jump back to Music.app just to skip a song.
     private var transportControls: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 6) {
             transportButton(systemName: "backward.fill", action: onPrevious)
             transportButton(systemName: "forward.fill", action: onNext)
         }
-        .padding(.top, 4)
+        .padding(.top, 3)
     }
 
     private func transportButton(systemName: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Image(systemName: systemName)
-                .font(.system(size: 12, weight: .semibold))
+                .font(.system(size: 8, weight: .semibold))
                 .foregroundStyle(.white.opacity(0.85))
-                .frame(width: 28, height: 28)
+                .frame(width: 18, height: 18)
                 .background(Circle().fill(.white.opacity(0.12)))
         }
         .buttonStyle(.plain)
