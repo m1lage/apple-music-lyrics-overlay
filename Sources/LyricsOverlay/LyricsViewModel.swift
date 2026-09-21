@@ -8,6 +8,9 @@ final class LyricsViewModel: ObservableObject {
     @Published var translation: String = ""
     @Published var isPaused: Bool = false
     @Published var hasNoLyrics: Bool = false
+    /// True while a lookup is in flight, so an empty lyrics array reads as
+    /// "still loading" rather than "this song has no lyrics".
+    var isLoadingLyrics = false
     @Published var isApproximateSync: Bool = false
     @Published var isFavorited: Bool = false
 
@@ -20,7 +23,7 @@ final class LyricsViewModel: ObservableObject {
     var lyrics: [LyricLine] = [] {
         didSet {
             currentIndex = -1
-            hasNoLyrics = lyrics.isEmpty
+            hasNoLyrics = lyrics.isEmpty && !isLoadingLyrics
             isApproximateSync = lyrics.first?.isApproximate ?? false
             sourceLanguageCode = Self.hasKana(lyrics) ? "ja" : "en"
         }
@@ -42,6 +45,7 @@ final class LyricsViewModel: ObservableObject {
         hasNoLyrics = false
         isApproximateSync = false
         isFavorited = false
+        isLoadingLyrics = false
         lyrics = []
     }
 

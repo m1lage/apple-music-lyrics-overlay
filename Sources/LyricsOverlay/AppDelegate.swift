@@ -89,6 +89,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             if info.trackId != lastTrackId {
                 lastTrackId = info.trackId
                 viewModel.trackTitle = "\(info.name) — \(info.artist)"
+                viewModel.isLoadingLyrics = true
                 viewModel.lyrics = []
                 lyricsService.fetchLyrics(
                     track: info.name,
@@ -98,6 +99,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 ) { [weak self] lines in
                     DispatchQueue.main.async {
                         guard self?.lastTrackId == info.trackId else { return }
+                        self?.viewModel.isLoadingLyrics = false
                         self?.viewModel.lyrics = lines
                     }
                 }
