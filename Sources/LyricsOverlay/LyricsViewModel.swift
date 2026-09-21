@@ -11,11 +11,24 @@ final class LyricsViewModel: ObservableObject {
     @Published var isApproximateSync: Bool = false
     @Published var isFavorited: Bool = false
 
+    /// Language the current song's lyrics are in, decided per song rather
+    /// than per line: a Japanese song has plenty of kanji-only lines that
+    /// look identical to Chinese, so one kana anywhere marks the whole track.
+    /// Everything else is assumed English (or Chinese, which is skipped).
+    @Published var sourceLanguageCode: String = "en"
+
     var lyrics: [LyricLine] = [] {
         didSet {
             currentIndex = -1
             hasNoLyrics = lyrics.isEmpty
             isApproximateSync = lyrics.first?.isApproximate ?? false
+            sourceLanguageCode = Self.hasKana(lyrics) ? "ja" : "en"
+        }
+    }
+
+    private static func hasKana(_ lines: [LyricLine]) -> Bool {
+        lines.contains { line in
+            line.text.unicodeScalars.contains { (0x3040...0x30FF).contains($0.value) }
         }
     }
 

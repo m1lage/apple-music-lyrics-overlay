@@ -30,7 +30,7 @@ struct LyricsOverlayView: View {
         }
         .translationTask(translationConfig) { session in
             let text = viewModel.currentLine
-            guard !text.isEmpty, !containsCJK(text) else { return }
+            guard needsTranslation(text) else { return }
             do {
                 let response = try await session.translate(text)
                 if text == viewModel.currentLine {
@@ -183,24 +183,32 @@ struct LyricsOverlayView: View {
     }
 
     private func requestTranslation(for text: String) {
-        guard !text.isEmpty, !containsCJK(text) else {
+        guard needsTranslation(text) else {
             viewModel.translation = ""
             return
         }
-        // Source is pinned to English rather than left to auto-detect (nil):
-        // short slang/ad-libs (common in hip-hop lyrics) are too ambiguous
-        // for on-device language ID, and an unspecified source makes the
-        // system pop up a "confirm language" prompt asking the user to pick
-        // one. Everything reaching here already passed the containsCJK
-        // filter, so English is the overwhelmingly common case anyway.
-        if translationConfig == nil {
+        // The source language is always given explicitly, never left to
+        // auto-detect (nil): short slang/ad-libs (common in hip-hop lyrics)
+        // are too ambiguous for on-device language ID, and an unspecified
+        // source makes the system pop up a "confirm language" prompt asking
+        // the user to pick one. It's chosen per song by the view model.
+        let source = Locale.Language(identifier: viewModel.sourceLanguageCode)
+        if translationConfig?.source == source {
+            translationConfig?.invalidate()
+        } else {
             translationConfig = TranslationSession.Configuration(
-                source: Locale.Language(identifier: "en"),
+                source: source,
                 target: Locale.Language(identifier: "zh-Hans")
             )
-        } else {
-            translationConfig?.invalidate()
         }
+    }
+
+    /// Chinese lines need no translation. On a Japanese track kanji-only
+    /// lines look like Chinese but aren't, so there every line is translated.
+    private func needsTranslation(_ text: String) -> Bool {
+        guard !text.isEmpty else { return false }
+        if viewModel.sourceLanguageCode == "ja" { return true }
+        return !containsCJK(text)
     }
 
     private func containsCJK(_ text: String) -> Bool {
